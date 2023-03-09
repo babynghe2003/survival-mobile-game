@@ -9,8 +9,15 @@ class Title() {
     // 2 -> wall
     // 3 -> tree
     // 4 -> trap
-    var bitmap: Bitmap? = null
-    var rect: Rect? = null
-    var collision = false
+
+    val title_size: Int = 50
+    var x: Float = 0f
+    var y: Float = 0f
+    lateinit var bitmap: Bitmap
+    var isPhasing: Boolean = true
+
+    fun getRect(): Rect{
+        return Rect(x.toInt(), y.toInt(), (x + title_size).toInt(), (y + title_size).toInt())
+    }
 
 }
