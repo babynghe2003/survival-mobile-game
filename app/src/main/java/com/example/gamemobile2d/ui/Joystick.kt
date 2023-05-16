@@ -15,6 +15,7 @@ class Joystick {
     private val handleRadius = 100f
     private val paint: Paint
 
+
     private var x = 0f
     private var y = 0f
     private var dist = 0f

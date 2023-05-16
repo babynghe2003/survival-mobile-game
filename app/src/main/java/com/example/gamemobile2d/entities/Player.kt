@@ -2,22 +2,32 @@ package com.example.gamemobile2d.entities
 
 import android.content.Context
 import android.graphics.*
+import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.util.Half.toFloat
+import androidx.core.content.ContextCompat.getSystemService
+import androidx.core.content.getSystemService
 import com.example.gamemobile2d.R
 import com.example.gamemobile2d.map.Title
 import com.example.gamemobile2d.ui.Joystick
 import com.example.gamemobile2d.utils.Shadow
 import com.example.gamemobile2d.utils.StatusBar
+import com.example.gamemobile2d.weapon.Storm
+import com.example.gamemobile2d.weapon.Weapon
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
+import kotlin.math.sqrt
 
 
-class Player(context: Context, private val joystick: Joystick, entities: List<Entity>, map: ArrayList<Title>) :
+class Player(private val context: Context, private val joystick: Joystick, entities: List<Entity>, map: ArrayList<Title>) :
     Entity(context, entities, map) {
     var isFlip = false
     val statusBar: StatusBar
     private val maxHealth = 100
+    private var skills : ArrayList<Weapon> = arrayListOf()
+    var score = 0
 
     init {
         shadow = Shadow()
@@ -47,6 +57,10 @@ class Player(context: Context, private val joystick: Joystick, entities: List<En
             BitmapFactory.decodeResource(context.resources, R.drawable.assasin_move_4),
             BitmapFactory.decodeResource(context.resources, R.drawable.assasin_move_5)
         )
+        skills.add(Storm(this,context))
+        skills.add(Storm(this,context).apply {
+            this.angle = Math.PI.toFloat()
+        })
     }
 
     private var currentSpriteIndex = 0
@@ -60,10 +74,40 @@ class Player(context: Context, private val joystick: Joystick, entities: List<En
 
             isFlip = cos(angle) * speed < 0
         }
+
+        for (skill in skills){
+            entities.forEach{
+                val dist = sqrt((it.x - this.x)*(it.x - this.x)
+                        + (it.y - this.y)*(it.y - this.y)).toDouble()
+                if (it is Enemy && dist < 500){
+                    if (skill.getHitbox().intersect(it.getHitbox())){
+                        it.isDamaged(7,10,x,y)
+                        if (it.health <= 0){
+                            score++
+                        }
+                    }
+                }
+            }
+        }
+        skills.forEach{
+            it.animate()
+        }
+    }
+
+    override fun isLevelUp(gameLevel: Int){
+        if (skills.size < 7){
+            skills.add(Storm(this, context))
+            val rootAngle = skills[0].angle
+            skills.forEachIndexed { index, weapon ->
+                weapon.angle = ((2*Math.PI / skills.size)*index % (2*Math.PI)).toFloat()
+                weapon.level ++
+            }
+        }
     }
 
 
     override fun draw(canvas: Canvas) {
+        shadow.draw(canvas, x, y, tileWidth, tileHeight)
         var bitmap: Bitmap? = null
         var dst = Rect(x.toInt(),y.toInt(), (x+tileWidth).toInt(), (y+tileHeight).toInt())
         if (joystick.isMoving()) {
@@ -78,8 +122,7 @@ class Player(context: Context, private val joystick: Joystick, entities: List<En
         } else {
             canvas.drawBitmap(bitmap, null, dst, null)
         }
-
-        shadow.draw(canvas, x, y, tileWidth, tileHeight)
+        skills.forEach{ it.draw(canvas) }
         statusBar.draw(canvas, x, y, tileWidth, tileHeight, maxHealth, health)
     }
 
@@ -94,12 +137,21 @@ class Player(context: Context, private val joystick: Joystick, entities: List<En
 
     override fun animate() {
         currentSpriteIndex = (currentSpriteIndex + 1) % spritesStand.size
+        skills.forEach{
+            it.animate()
+        }
     }
 
     override fun isDamaged(dame: Int, push: Int, dameX: Float, dameY: Float) {
         val dameAngle = atan2(dameY - y, dameX - x)
-        checkForXCollision(-cos(dameAngle) *push)
-        checkForYCollision(-sin(dameAngle) * push)
+//        checkForXCollision(-cos(dameAngle) *push)
+//        checkForYCollision(-sin(dameAngle) * push)
+        val vibrator = context?.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        if (Build.VERSION.SDK_INT >= 26) {
+            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE))
+        } else {
+            vibrator.vibrate(200)
+        }
         if (health >= 0) {
             health -= dame
         }
@@ -107,4 +159,5 @@ class Player(context: Context, private val joystick: Joystick, entities: List<En
             health = 0
         }
     }
+
 }

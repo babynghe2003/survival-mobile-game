@@ -19,9 +19,9 @@ class Enemy(context: Context, entities: List<Entity>, map: ArrayList<Title>): En
     val random = Random
 
     init{
-        x = (100..1300).random().toFloat()
-        y = (100..1300).random().toFloat()
-        speed = 6f
+//        x = (100..1300).random().toFloat()
+//        y = (100..1300).random().toFloat()
+        speed = 4f
         shadow = Shadow()
         visionRange = 600f
         spritesStand = listOf()
@@ -31,13 +31,13 @@ class Enemy(context: Context, entities: List<Entity>, map: ArrayList<Title>): En
             BitmapFactory.decodeResource(context.resources, R.drawable.babydragon_3),
             BitmapFactory.decodeResource(context.resources, R.drawable.babydragon_4),
         )
-        tileWidth = spritesMove[0].width/2.toFloat()
-        tileHeight = spritesMove[0].height/2.toFloat()
+        tileWidth = spritesMove[0].width*2/3.toFloat()
+        tileHeight = spritesMove[0].height*2/3.toFloat()
         attackRange = max(tileHeight, tileWidth) + 5f
 
     }
     fun checkVision(){
-        var minDistance = 1000000f
+        var minDistance = 1300000f
         isTracking = false
         for (ett in entities){
             if (ett is Player){
@@ -67,6 +67,7 @@ class Enemy(context: Context, entities: List<Entity>, map: ArrayList<Title>): En
     }
 
     override fun draw(canvas: Canvas) {
+        shadow.draw(canvas, x, y, tileWidth, tileHeight)
         var bitmap = spritesMove[currentSpriteIndex]
         val dst = Rect(x.toInt(), y.toInt(), (x+tileWidth).toInt(), (y+tileHeight).toInt())
         if (isFlip) {
@@ -74,7 +75,6 @@ class Enemy(context: Context, entities: List<Entity>, map: ArrayList<Title>): En
         } else {
             canvas.drawBitmap(bitmap, null, dst, null)
         }
-        shadow.draw(canvas, x, y, tileWidth, tileHeight)
     }
     fun flip(d: Bitmap): Bitmap {
         val m = Matrix()
@@ -98,6 +98,16 @@ class Enemy(context: Context, entities: List<Entity>, map: ArrayList<Title>): En
         else {
             health = 0
         }
+    }
+
+    override fun isLevelUp(gameLevel: Int) {
+        speed = 6f + gameLevel
+        health = 100+ gameLevel*10
+    }
+
+
+    fun deadAnimation(camvas: Canvas){
+
     }
 
 }

@@ -1,13 +1,11 @@
 package com.example.gamemobile2d.weapon
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Canvas
-import android.graphics.Matrix
+import android.graphics.*
 import com.example.gamemobile2d.R
+import com.example.gamemobile2d.entities.Player
 
-class Sword(context: Context): Weapon(context) {
+class Sword(player: Player, context: Context): Weapon(context) {
     init {
         bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.bloodkatana)
         spritesAttack = listOf(
@@ -16,6 +14,7 @@ class Sword(context: Context): Weapon(context) {
             BitmapFactory.decodeResource(context.resources, R.drawable.cut_3),
             BitmapFactory.decodeResource(context.resources, R.drawable.cut_4),
         )
+        playerOwner = player
     }
 
     override fun animate() {
@@ -34,5 +33,9 @@ class Sword(context: Context): Weapon(context) {
     }
 
     override fun attack() {
+    }
+
+    override fun getHitbox(): Rect {
+        TODO("Not yet implemented")
     }
 }

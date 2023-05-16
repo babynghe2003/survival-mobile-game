@@ -13,6 +13,7 @@ import kotlin.random.Random
 class Map(private val context: Context) {
     val titles: Array<Title>
     val map: ArrayList<Title> = arrayListOf()
+    val wallMap : ArrayList<Title> = arrayListOf()
     var random = Random
     init{
         titles = arrayOf(
@@ -39,6 +40,16 @@ class Map(private val context: Context) {
                        isPhasing = if (column != '2') true else false
                    }
                )
+                if (column == '2'){
+                    wallMap.add(
+                        Title().apply {
+                            bitmap = titles.get(column.toString().toInt() - 1).bitmap
+                            x = posX.toFloat()
+                            y = posY.toFloat()
+                            isPhasing = false
+                        }
+                    )
+                }
             }
         }
     }
@@ -49,12 +60,10 @@ class Map(private val context: Context) {
         }
     }
     fun drawlayer2(canvas: Canvas){
-        for (tile in map){
-            if (!tile.isPhasing){
+        for (tile in wallMap){
                 val d = tile.getRect()
                 val dst = Rect(d.left, d.top - d.height() / 2, d.right, d.bottom - d.height() / 2 )
                 canvas.drawBitmap(titles.get(3).bitmap, null, dst, null)
-            }
         }
     }
 

@@ -23,6 +23,7 @@ abstract class Entity(context: Context, val entities: List<Entity>, val map: Arr
     var visionRange = 300f
     var attackRange = 100f
     var health = 100
+    var isAlive = true
 
     lateinit var spritesStand: List<Bitmap>
     lateinit var spritesMove: List<Bitmap>
@@ -68,7 +69,6 @@ abstract class Entity(context: Context, val entities: List<Entity>, val map: Arr
 
         for (tile in map) {
 
-            if (!tile.isPhasing) {
                 val colli = tile.getRect()
                 if (!Rect.intersects(colli, getHitbox())) {
                     continue
@@ -84,7 +84,7 @@ abstract class Entity(context: Context, val entities: List<Entity>, val map: Arr
                     oldX = x
                 }
 
-            }
+
         }
 
     }
@@ -112,7 +112,6 @@ abstract class Entity(context: Context, val entities: List<Entity>, val map: Arr
         }
 
         for (tile in map) {
-            if (!tile.isPhasing) {
                 val colli = tile.getRect()
                 if (!Rect.intersects(colli, getHitbox())) {
                     continue
@@ -127,7 +126,6 @@ abstract class Entity(context: Context, val entities: List<Entity>, val map: Arr
                     y = oldY
                     oldY = y
                 }
-            }
         }
 
     }
@@ -136,6 +134,7 @@ abstract class Entity(context: Context, val entities: List<Entity>, val map: Arr
     abstract fun draw(canvas: Canvas)
     abstract fun animate()
     abstract fun isDamaged(dame: Int, push: Int, dameX: Float, dameY: Float)
+    abstract fun isLevelUp(gameLevel: Int)
 
 
 }

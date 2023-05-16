@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity() {
         val gameview = findViewById<GameView>(R.id.gameview)
 
         val pauseButton = Button(this)
-        pauseButton.text = "Pause"
+        pauseButton.text = "Start"
         pauseButton.setOnClickListener {
             if (gameview.isPause) {
                 gameview.resumeGame()
@@ -29,7 +29,12 @@ class MainActivity : AppCompatActivity() {
                 gameview.pauseGame()
                 pauseButton.text = "Resume" // update button text
             }
+            if (!gameview.running){
+                gameview.startGame()
+                pauseButton.text = "Pause"
+            }
         }
+        gameview.pauseButton = pauseButton
 
         val layoutParams = FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.WRAP_CONTENT,

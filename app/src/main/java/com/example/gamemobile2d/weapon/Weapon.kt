@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Rect
 import com.example.gamemobile2d.entities.Entity
+import com.example.gamemobile2d.entities.Player
 
 abstract class Weapon(context: Context) {
     var damage: Int = 0
@@ -14,8 +15,11 @@ abstract class Weapon(context: Context) {
     var tile_x: Float = 32f
     var tile_y: Float = 32f
     var current_sprites: Int = 0
+    lateinit var playerOwner : Player
+    var level = 0
 
     abstract fun animate()
     abstract fun draw(canvas: Canvas)
     abstract fun attack()
+    abstract fun getHitbox(): Rect
 }
