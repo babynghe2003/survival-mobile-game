@@ -82,9 +82,6 @@ class Player(private val context: Context, private val joystick: Joystick, entit
                 if (it is Enemy && dist < 500){
                     if (skill.getHitbox().intersect(it.getHitbox())){
                         it.isDamaged(7,10,x,y)
-                        if (it.health <= 0){
-                            score++
-                        }
                     }
                 }
             }

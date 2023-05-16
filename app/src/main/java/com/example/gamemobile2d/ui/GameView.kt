@@ -7,10 +7,19 @@ import android.util.Log
 import android.view.*
 import android.widget.Button
 import android.widget.FrameLayout
+import android.widget.Toast
+import com.example.gamemobile2d.ScoreModel
 import com.example.gamemobile2d.entities.Enemy
 import com.example.gamemobile2d.entities.Entity
 import com.example.gamemobile2d.entities.Player
 import com.example.gamemobile2d.map.Map
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.math.sqrt
 
 class GameView(context: Context, attributes: AttributeSet) : SurfaceView(context, attributes), SurfaceHolder.Callback{
@@ -100,6 +109,7 @@ class GameView(context: Context, attributes: AttributeSet) : SurfaceView(context
         gameThread = null
 
         entities = arrayListOf()
+        entities.clear()
 
         gameStartTime = System.nanoTime()
         gameLastTime = 0L
@@ -119,6 +129,7 @@ class GameView(context: Context, attributes: AttributeSet) : SurfaceView(context
         player = Player(context, joystick, entities, map.wallMap)
         player.x = 700f
         player.y = 700f
+        player.score = 0
         entities.add(player)
 //        entities.add(player2)
         for(i in 0..20+gameLevel*5){
@@ -207,6 +218,11 @@ class GameView(context: Context, attributes: AttributeSet) : SurfaceView(context
             }
             lastupdate = 0
         }
+        for (ent in entities){
+            if (ent.isAlive == false){
+                player.score++
+            }
+        }
         entities.removeIf{
             it.isAlive == false
         }
@@ -265,8 +281,49 @@ class GameView(context: Context, attributes: AttributeSet) : SurfaceView(context
             it.drawText("Time: ${gameTime.toString()}", width/2/cameraScale + 50 -  cameraX, 100f - cameraY, timePaintBorder)
             it.drawText("Time: ${gameTime.toString()}", width/2/cameraScale + 50 - cameraX, 100f - cameraY, timePaint)
             if (!running){
+                val database = FirebaseDatabase.getInstance()
+                val myRef = database.getReference("HighScore")
+                var maxScore = 0
+                val key = myRef.push().key
+                val score = ScoreModel(player.score,
+                    SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date()).toString()
+                )
+                if (key!=null)
+                    myRef.child(key).setValue(score).addOnCompleteListener{
+                        Log.d("DB", "Add success")
+                        Toast.makeText(this.context, "Product added successfully",Toast.LENGTH_SHORT).show()
+                    }.addOnFailureListener{
+                        Log.d("DB", "Add error")
+                        Toast.makeText(this.context, "ERROR: ${it.message}",Toast.LENGTH_SHORT).show()
+                    }
+                else{
+                    Log.d("DB", "Can't create key")
+                    Toast.makeText(this.context, "ERROR: when connect",Toast.LENGTH_SHORT).show()
+                }
+//                myRef.addListenerForSingleValueEvent(object : ValueEventListener{
+//                    override fun onDataChange(snapshot: DataSnapshot) {
+//                        for (childSnapShot in snapshot.children){
+//                            val datascore = childSnapShot.child("score").getValue(Int::class.java)
+//                            if (datascore!=null && datascore > maxScore){
+//                                maxScore = datascore
+//                            }
+//                        }
+//                        Log.d("Score", maxScore.)
+//                        if (maxScore!=0 &&maxScore <= player.score){
+//                            it.drawText("High score!!!",  -cameraX + width/2/cameraScale - endScorePaint.measureText("Your score: ${player.score}")/2, height/2/cameraScale + 100f - cameraY, endScorePaint)
+//                        }
+//                        it.drawText("GAME OVER", -cameraX + width/2/cameraScale - endPaint.measureText("GAME OVER")/2, height/2/cameraScale - cameraY, endPaint)
+//                        it.drawText("Your score: ${player.score}",  -cameraX + width/2/cameraScale - endScorePaint.measureText("Your score: ${player.score}")/2, height/2/cameraScale + 200f - cameraY, endScorePaint)
+//
+//                    }
+//                    override fun onCancelled(error: DatabaseError) {
+//                        TODO("Not yet implemented")
+//                    }
+//
+//                })
                 it.drawRect( -2000f, -2000f, 100000f, 100000f, endBackGround)
                 it.drawText("GAME OVER", -cameraX + width/2/cameraScale - endPaint.measureText("GAME OVER")/2, height/2/cameraScale - cameraY, endPaint)
+
                 it.drawText("Your score: ${player.score}",  -cameraX + width/2/cameraScale - endScorePaint.measureText("Your score: ${player.score}")/2, height/2/cameraScale + 200f - cameraY, endScorePaint)
             }
             if (isPause){

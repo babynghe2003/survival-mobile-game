@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "792855979589",
+    "firebase_url": "https://gamemobile2d-f1c8a-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "gamemobile2d-f1c8a",
+    "storage_bucket": "gamemobile2d-f1c8a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:792855979589:android:e6587563b29ed57a2c652c",
+        "android_client_info": {
+          "package_name": "com.example.gamemobile2d"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "792855979589-md04cs3lb05ub3tlifaearuraofjce4u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBL_CTuWTz4LKaN5tivel8CuN-juineAfo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "792855979589-md04cs3lb05ub3tlifaearuraofjce4u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
